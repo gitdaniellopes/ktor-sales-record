@@ -1,5 +1,6 @@
 package daniel.lopes.co
 
+import daniel.lopes.co.routes.loginRoute
 import daniel.lopes.co.routes.registerRoute
 import io.ktor.application.*
 import io.ktor.features.*
@@ -15,6 +16,7 @@ fun Application.module(testing: Boolean = false) {
     install(CallLogging)
     install(Routing) {
         registerRoute()
+        loginRoute()
     }
     install(ContentNegotiation) {
         gson {
