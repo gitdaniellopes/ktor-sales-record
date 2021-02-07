@@ -1,18 +1,18 @@
 package daniel.lopes.co.data
 
-import daniel.lopes.co.data.collections.Sales
+import daniel.lopes.co.data.collections.Sale
 import daniel.lopes.co.data.collections.User
-import kotlinx.css.em
 import org.litote.kmongo.contains
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
+import org.litote.kmongo.setValue
 
 
 private val client = KMongo.createClient().coroutine
 private val database = client.getDatabase("SalesDatabase")
 private val users = database.getCollection<User>()
-private val sales = database.getCollection<Sales>()
+private val sales = database.getCollection<Sale>()
 
 suspend fun registerUser(user: User): Boolean {
     return users.insertOne(user).wasAcknowledged()
@@ -28,6 +28,30 @@ suspend fun checkPasswordForEmail(email: String, passwordToCheck: String): Boole
     return actualPassword == passwordToCheck
 }
 
-suspend fun getSalesForUser(email: String): List<Sales> {
-    return sales.find(Sales::owners contains email).toList()
+suspend fun getSalesForUser(email: String): List<Sale> {
+    return sales.find(Sale::owners contains email).toList()
+}
+
+suspend fun saveSale(sale: Sale): Boolean {
+    val saleExists = sales.findOneById(sale.id) != null
+    return if (saleExists) {
+        sales.updateOneById(sale.id, sale).wasAcknowledged()
+    } else {
+        sales.insertOne(sale).wasAcknowledged()
+    }
+}
+
+suspend fun deleteSaleForUser(email: String, saleID: String): Boolean {
+    val sale = sales.findOne(Sale::id eq saleID, Sale::owners contains email)
+    sale?.let { safeSale ->
+        if (safeSale.owners.size > 1) {
+            val newOwners = safeSale.owners - email
+            val updateResult = sales.updateOne(
+                Sale::id eq safeSale.id,
+                setValue(Sale::owners, newOwners)
+            )
+            return updateResult.wasAcknowledged()
+        }
+        return sales.deleteOneById(safeSale.id).wasAcknowledged()
+    } ?: return false
 }

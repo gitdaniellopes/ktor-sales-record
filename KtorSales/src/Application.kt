@@ -35,7 +35,7 @@ fun Application.module(testing: Boolean = false) {
 
 private fun Authentication.Configuration.configureAuth() {
     basic {
-        realm = "Sales Server"
+        realm = "Sale Server"
         validate { credentials ->
             val email = credentials.name
             val password = credentials.password
