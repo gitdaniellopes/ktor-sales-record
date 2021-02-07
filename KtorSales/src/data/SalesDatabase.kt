@@ -2,6 +2,8 @@ package daniel.lopes.co.data
 
 import daniel.lopes.co.data.collections.Sales
 import daniel.lopes.co.data.collections.User
+import kotlinx.css.em
+import org.litote.kmongo.contains
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
@@ -21,7 +23,11 @@ suspend fun checkIfUserExists(email: String): Boolean {
 }
 
 //verifica se a senha bate com o email cadastrado
-suspend fun checkPasswordForEmail(email: String, passwordToCheck: String): Boolean{
+suspend fun checkPasswordForEmail(email: String, passwordToCheck: String): Boolean {
     val actualPassword = users.findOne(User::email eq email)?.password ?: return false
     return actualPassword == passwordToCheck
+}
+
+suspend fun getSalesForUser(email: String): List<Sales> {
+    return sales.find(Sales::owners contains email).toList()
 }

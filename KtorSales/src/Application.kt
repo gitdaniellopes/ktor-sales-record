@@ -3,6 +3,7 @@ package daniel.lopes.co
 import daniel.lopes.co.data.checkPasswordForEmail
 import daniel.lopes.co.routes.loginRoute
 import daniel.lopes.co.routes.registerRoute
+import daniel.lopes.co.routes.saleRoutes
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -28,6 +29,7 @@ fun Application.module(testing: Boolean = false) {
     install(Routing) {
         registerRoute()
         loginRoute()
+        saleRoutes()
     }
 }
 
