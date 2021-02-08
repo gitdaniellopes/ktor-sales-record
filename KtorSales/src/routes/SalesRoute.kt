@@ -1,10 +1,10 @@
 package daniel.lopes.co.routes
 
+import daniel.lopes.co.data.*
 import daniel.lopes.co.data.collections.Sale
-import daniel.lopes.co.data.deleteSaleForUser
-import daniel.lopes.co.data.getSalesForUser
+import daniel.lopes.co.data.requests.AddOwnerRequest
 import daniel.lopes.co.data.requests.DeleteSaleRequest
-import daniel.lopes.co.data.saveSale
+import daniel.lopes.co.data.responses.SimpleResponse
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
@@ -21,6 +21,42 @@ fun Route.saleRoutes() {
                 val email = call.principal<UserIdPrincipal>()!!.name
                 val sales = getSalesForUser(email)
                 call.respond(OK, sales)
+            }
+        }
+    }
+
+    route("/addOwnerToSale") {
+        authenticate {
+            post {
+                val request = try {
+                    call.receive<AddOwnerRequest>()
+                } catch (e: ContentTransformationException) {
+                    call.respond(BadRequest)
+                    return@post
+                }
+
+                if (!checkIfUserExists(request.owner)) {
+                    call.respond(
+                        OK,
+                        SimpleResponse(false, "Não existe nenhum usuário com este e-mail")
+                    )
+                    return@post
+                }
+                if (isOwnerOfSale(request.saleID, request.owner)) {
+                    call.respond(
+                        OK,
+                        SimpleResponse(false, "Este usuário já é um proprietário desta nota")
+                    )
+                    return@post
+                }
+                if (addOwnerToSale(request.saleID, request.owner)) {
+                    call.respond(
+                        OK,
+                        SimpleResponse(true, "${request.owner} agora pode ver esta nota")
+                    )
+                } else {
+                    call.respond(Conflict)
+                }
             }
         }
     }

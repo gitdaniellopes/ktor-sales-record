@@ -32,6 +32,16 @@ suspend fun getSalesForUser(email: String): List<Sale> {
     return sales.find(Sale::owners contains email).toList()
 }
 
+suspend fun isOwnerOfSale(saleID: String, owner: String): Boolean {
+    val sale = sales.findOneById(saleID) ?: return false
+    return owner in sale.owners
+}
+
+suspend fun addOwnerToSale(saleID: String, owner: String): Boolean {
+    val owners = sales.findOneById(saleID)?.owners ?: return false
+    return sales.updateOneById(saleID, setValue(Sale::owners, owners + owner)).wasAcknowledged()
+}
+
 suspend fun saveSale(sale: Sale): Boolean {
     val saleExists = sales.findOneById(sale.id) != null
     return if (saleExists) {
