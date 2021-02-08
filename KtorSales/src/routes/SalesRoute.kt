@@ -45,14 +45,14 @@ fun Route.saleRoutes() {
                 if (isOwnerOfSale(request.saleID, request.owner)) {
                     call.respond(
                         OK,
-                        SimpleResponse(false, "Este usuário já é um proprietário desta nota")
+                        SimpleResponse(false, "Este usuário já é um proprietário desta venda")
                     )
                     return@post
                 }
                 if (addOwnerToSale(request.saleID, request.owner)) {
                     call.respond(
                         OK,
-                        SimpleResponse(true, "${request.owner} agora pode ver esta nota")
+                        SimpleResponse(true, "${request.owner} agora pode ver esta venda")
                     )
                 } else {
                     call.respond(Conflict)
