@@ -28,6 +28,10 @@ suspend fun checkPasswordForEmail(email: String, passwordToCheck: String): Boole
     return actualPassword == passwordToCheck
 }
 
+suspend fun searchSale(term: String): List<Sale> {
+    return sales.find(Sale::productCode eq term).toList()
+}
+
 suspend fun getSalesForUser(email: String): List<Sale> {
     return sales.find(Sale::owners contains email).toList()
 }

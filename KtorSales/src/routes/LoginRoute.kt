@@ -26,7 +26,7 @@ fun Route.loginRoute() {
             val isPasswordCorrect =
                 checkPasswordForEmail(request.email, request.password)
             if (isPasswordCorrect) {
-                call.respond(OK, "Agora você está logado")
+                call.respond(OK, SimpleResponse(true, "Agora você está logado"))
             } else {
                 call.respond(OK, SimpleResponse(false, "O e-mail ou senha estão incorretos"))
             }
