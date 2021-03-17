@@ -15,6 +15,9 @@ import io.ktor.routing.*
 fun Route.registerRoute() {
     route("/register") {
         post {
+            call.respondText {
+                "dev"
+            }
             val request = try {
                 call.receive<AccountRequest>()
             } catch (e: ContentTransformationException) {
@@ -32,6 +35,7 @@ fun Route.registerRoute() {
             } else {
                 call.respond(OK, SimpleResponse(false, "Um usuário com este email já existe"))
             }
+
         }
     }
 }
